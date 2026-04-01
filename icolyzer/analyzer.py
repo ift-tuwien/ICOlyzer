@@ -143,9 +143,9 @@ def main():
 
             if timestamp < last_timestamp:
                 print_error(
-                    f"Latest data at {timestamp/1_000_000:.6f} seconds is "
+                    f"Latest data at {timestamp / 1_000_000:.6f} seconds is "
                     "older than data before at "
-                    f"{last_timestamp/1_000_000:.6f} seconds"
+                    f"{last_timestamp / 1_000_000:.6f} seconds"
                 )
 
             last_timestamp = timestamp
