@@ -73,7 +73,3 @@ ignore_missing_imports = true
 # Ignore macOS metadata files
 addopts = "--doctest-modules -x --ignore-glob='*._*.py'"
 minversion = "6.0"
-
-[tool.yapfignore]
-# Ignore macOS metadata files
-ignore_patterns = [ "*._*.py" ]
