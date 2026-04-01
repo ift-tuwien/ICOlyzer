@@ -278,3 +278,20 @@ Starting the conversion of: /Users/rene/Downloads/log.hdf5
 Starting the conversion of: /Users/rene/Downloads/Measurement_2022-03-31_10-20-16.hdf5
 Finished the conversion process
 ```
+
+# Development
+
+While not strictly required we assume that you installed:
+
+- [`just`](https://github.com/casey/just) and
+- [`uv`](https://docs.astral.sh/uv)
+
+in the description below.
+
+## Test
+
+To run the tests please use the following command:
+
+```sh
+just test
+```

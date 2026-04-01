@@ -34,12 +34,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
           check-latest: true
 
-      - name: Install dependencies
-        run: |
-          pip install .[dev,test]
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python-version }}
 
-      - name: Check code
-        run: make check
+      - name: Install just
+        uses: taiki-e/install-action@just
 
-      - name: Test code
-        run: make test
+      - name: Check and test code
+        run: just test
