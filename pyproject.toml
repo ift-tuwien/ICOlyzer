@@ -63,6 +63,8 @@ Source = "https://github.com/mytoolit/ICOlyzer/"
 [tool.black]
 line-length = 79
 preview = true
+unstable = true
+enable-unstable-feature = ["string_processing"]
 
 [tool.flake8]
 ignore = [
