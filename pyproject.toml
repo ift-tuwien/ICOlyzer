@@ -42,7 +42,7 @@ version = "1.8.0"
 
 [project.optional-dependencies]
 dev = [
-    "flake8",
+    "Flake8-pyproject>=1.2.3",
     "mypy",
     "pylint>=3.0.2",
     "toml",
@@ -64,8 +64,29 @@ Source = "https://github.com/mytoolit/ICOlyzer/"
 line-length = 79
 preview = true
 
+[tool.flake8]
+ignore = [
+  # Whitespace before colon
+  "E203",
+  # Module level import not at top of file
+  "E402",
+  # Line break before binary operator
+  "W503",
+  # Line break after binary operator
+  "W504"
+]
+per-file-ignores = "__init__.py:F401"
+exclude = [
+  ".git",
+  ".venv",
+  "__pycache__",
+]
+
 [tool.mypy]
 ignore_missing_imports = true
+
+[tool.pylint]
+ignore-paths = [ ".venv/.*$" ]
 
 [tool.pytest.ini_options]
 # Use doctests
