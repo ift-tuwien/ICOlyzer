@@ -1,0 +1,4 @@
+global-include *.so
+global-include *.dll
+global-include *.dylib
+include README.md

@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=65"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [project]
 authors = [
@@ -73,12 +73,6 @@ ignore_missing_imports = true
 # Ignore macOS metadata files
 addopts = "--doctest-modules -x --ignore-glob='*._*.py'"
 minversion = "6.0"
-
-[tool.setuptools.packages.find]
-include = ["icolyzer*"]
-
-[tool.setuptools.package-data]
-"icolyzer.iftlibrary.lib" = ["*.dll", "*.dylib","*.so"]
 
 [tool.yapfignore]
 # Ignore macOS metadata files
