@@ -107,7 +107,7 @@ def main():
         last_counter = data["counter"][0]
         last_timestamp = data["timestamp"][0]
         packet_loss = 0
-        packets = 0
+        packets = 1  # First packet will be skipped by for loop
         losses = 0
         for counter, timestamp in zip(data["counter"], data["timestamp"]):
             if counter == last_counter:
