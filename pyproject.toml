@@ -56,6 +56,7 @@ test = [
 icoanalyzer = "icolyzer.analyzer:main"
 icoconverter = "icolyzer.converter:main"
 icoplotter = "icolyzer.plotter:main"
+icocutter = "icolyzer.cutter:main"
 
 [project.urls]
 Source = "https://github.com/mytoolit/ICOlyzer/"
