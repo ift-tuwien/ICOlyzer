@@ -24,6 +24,13 @@ Check that opening a non-existent file fails
   icocutter: error: argument filepath: “does-not-exist.hdf5” does not exist
   [2]
 
+Check that using an incorrect time argument fails
+
+  $ icocutter --time hello examples/log-z.hdf5
+  usage: icocutter [-h] [-t TIME] filepath
+  icocutter: error: argument -t/--time: “hello” is not a valid measurement time
+  [2]
+
 Check if opening a file works
 
   $ icocutter examples/log-z.hdf5
