@@ -5,7 +5,7 @@ Setup
 Print help output
 
   $ icocutter -h
-  usage: icocutter [-h] [-t TIME] filepath
+  usage: icocutter [-h] -t TIME filepath
   
   Split a HDF5 file into two parts
   
@@ -20,17 +20,20 @@ Print help output
 Check that opening a non-existent file fails
 
   $ icocutter -t 10 does-not-exist.hdf5
-  usage: icocutter [-h] [-t TIME] filepath
+  usage: icocutter [-h] -t TIME filepath
   icocutter: error: argument filepath: “does-not-exist.hdf5” does not exist
   [2]
 
 Check that using an incorrect time argument fails
 
   $ icocutter --time hello examples/log-z.hdf5
-  usage: icocutter [-h] [-t TIME] filepath
+  usage: icocutter [-h] -t TIME filepath
   icocutter: error: argument -t/--time: “hello” is not a valid measurement time
   [2]
 
-Check if opening a file works
+Check that not providing a time to cut fails
 
   $ icocutter examples/log-z.hdf5
+  usage: icocutter [-h] -t TIME filepath
+  icocutter: error: the following arguments are required: -t/--time
+  [2]

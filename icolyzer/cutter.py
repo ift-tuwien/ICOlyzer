@@ -31,6 +31,7 @@ def get_arguments() -> Namespace:
         "-t",
         "--time",
         type=measurement_time,
+        required=True,
         help=(
             "the maximum timestamp in seconds that should still be part of "
             "the first HDF5 file"
