@@ -17,6 +17,13 @@ Print help output
     -t.*TIME  \s*the maximum timestamp in seconds that should still be.* (re)
                .*of the first HDF5 file (re)
 
+Check that opening a non-existent file fails
+
+  $ icocutter -t 10 does-not-exist.hdf5
+  usage: icocutter [-h] [-t TIME] filepath
+  icocutter: error: argument filepath: “does-not-exist.hdf5” does not exist
+  [2]
+
 Check if opening a file works
 
   $ icocutter examples/log-z.hdf5
