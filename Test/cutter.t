@@ -38,6 +38,12 @@ Check that not providing a time to cut fails
   icocutter: error: the following arguments are required: -t/--time
   [2]
 
-Check that opening an existing file works
+Check that using a cutting time is too large fails
+
+  $ icocutter --time 30 examples/log-z.hdf5
+  Time to cut of “0:00:30” is equal or larger than measurement time of “0:00:29.991154”
+  [1]
+
+Check that opening an existing file works with a valid cutting time works
 
   $ icocutter --time 10 examples/log-z.hdf5

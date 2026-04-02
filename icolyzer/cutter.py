@@ -3,7 +3,10 @@
 # -- Imports ------------------------------------------------------------------
 
 from argparse import ArgumentParser, Namespace
+from datetime import timedelta
 from pathlib import Path
+from sys import exit as sys_exit, stderr
+
 from pandas import read_hdf
 
 from icolyzer.cli import file_exists, measurement_time
@@ -41,13 +44,31 @@ def get_arguments() -> Namespace:
     return parser.parse_args()
 
 
+def exit_error(message: str) -> None:
+    """Exit program with the given error message"""
+
+    print(message, file=stderr)
+
+    sys_exit(1)
+
+
 def main() -> None:
     """Split a HDF5 measurement file into two parts"""
 
     args = get_arguments()
 
     filepath = Path(args.filepath)
-    read_hdf(filepath, key="acceleration")
+    data = read_hdf(filepath, key="acceleration")
+
+    measurement_timedelta = timedelta(
+        microseconds=int(data.timestamp.iloc[-1])
+    )
+    cut_timedelta = timedelta(seconds=args.time)
+    if cut_timedelta >= measurement_timedelta:
+        exit_error(
+            f"Time to cut of “{cut_timedelta}” is equal or larger than "
+            f"measurement time of “{measurement_timedelta}”",
+        )
 
 
 # -- Main ---------------------------------------------------------------------
