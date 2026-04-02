@@ -20,7 +20,7 @@ def get_arguments() -> Namespace:
 
     parser = ArgumentParser(description="Split a HDF5 file into two parts")
     parser.add_argument(
-        "input",
+        "filepath",
         type=file_exists,
         help="measurement data in HDF5 format",
     )
