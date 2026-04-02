@@ -16,3 +16,7 @@ Print help output
     -h, --help\s*show this help message and exit (re)
     -t.*TIME  \s*the maximum timestamp in seconds that should still be.* (re)
                .*of the first HDF5 file (re)
+
+Check if opening a file works
+
+  $ icocutter examples/log-z.hdf5

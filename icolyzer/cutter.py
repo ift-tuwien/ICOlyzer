@@ -3,6 +3,8 @@
 # -- Imports ------------------------------------------------------------------
 
 from argparse import ArgumentParser, Namespace
+from pathlib import Path
+from pandas import read_hdf
 
 from icolyzer.cli import file_exists, measurement_time
 
@@ -41,7 +43,10 @@ def get_arguments() -> Namespace:
 def main() -> None:
     """Split a HDF5 measurement file into two parts"""
 
-    get_arguments()
+    args = get_arguments()
+
+    filepath = Path(args.filepath)
+    read_hdf(filepath, key="acceleration")
 
 
 # -- Main ---------------------------------------------------------------------
