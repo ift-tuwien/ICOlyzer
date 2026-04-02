@@ -37,3 +37,7 @@ Check that not providing a time to cut fails
   usage: icocutter [-h] -t TIME filepath
   icocutter: error: the following arguments are required: -t/--time
   [2]
+
+Check that opening an existing file works
+
+  $ icocutter --time 10 examples/log-z.hdf5
