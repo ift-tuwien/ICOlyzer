@@ -86,11 +86,12 @@ def remove_second_part(filepath: Path, cutoff: timedelta) -> int:
 
     Returns:
 
-        The index of the last row of the modified measurement data
+        The index of the first row that is not part of the modified
+        measurement data
 
     """
 
-    last_row_to_include = 0
+    first_row_to_remove = 0
 
     with open_file(filepath, mode="r+") as copy:
         data = copy.get_node("/acceleration")
@@ -100,15 +101,33 @@ def remove_second_part(filepath: Path, cutoff: timedelta) -> int:
         for row in data.iterrows():
             if row["timestamp"] > cut_microseconds:
                 break
-            last_row_to_include += 1
+            first_row_to_remove += 1
 
-        data.remove_rows(last_row_to_include)
-        print(
-            f"Stored first part of HDF data ({timedelta(seconds=0)} – "
-            f"{cutoff}) in “{filepath}”"
-        )
+        data.remove_rows(first_row_to_remove)
 
-    return last_row_to_include
+    return first_row_to_remove
+
+
+def remove_first_part(filepath: Path, first_row: int) -> None:
+    """Remove measurement before a certain cutoff point
+
+    Args:
+
+        filepath:
+
+            Path to the HDF file that should be cut
+
+        first_row:
+
+            The index of the first row that should be included in the
+            measurement data
+
+    """
+
+    with open_file(filepath, mode="r+") as copy:
+        data = copy.get_node("/acceleration")
+
+        data.remove_rows(start=0, stop=first_row)
 
 
 def main() -> None:
@@ -138,11 +157,22 @@ def main() -> None:
         )
 
     first_part_filepath = filepath.with_stem(f"{filepath.stem}-part-1")
+    second_part_filepath = filepath.with_stem(f"{filepath.stem}-part-2")
 
     with open_file(filepath, mode="r") as original:
         original.copy_file(first_part_filepath, overwrite=args.overwrite)
+        original.copy_file(second_part_filepath, overwrite=args.overwrite)
 
-    remove_second_part(first_part_filepath, cut_timedelta)
+    first_row_removed = remove_second_part(first_part_filepath, cut_timedelta)
+    print(
+        f"Stored first part of HDF data ({timedelta(seconds=0)} – "
+        f"{cut_timedelta}) in “{first_part_filepath}”"
+    )
+    remove_first_part(second_part_filepath, first_row_removed)
+    print(
+        f"Stored second part of HDF data ({cut_timedelta} – "
+        f"{measurement_timedelta}) in “{second_part_filepath}”"
+    )
 
 
 # -- Main ---------------------------------------------------------------------
