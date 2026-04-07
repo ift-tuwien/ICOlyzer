@@ -42,5 +42,13 @@ jobs:
       - name: Install just
         uses: taiki-e/install-action@just
 
+      - name: Install h5dump on Linux
+        if: ${{ runner.os == 'Linux' }}
+        run: sudo apt install hdf5-tools
+
+      - name: Install h5dump on macOS
+        if: ${{ runner.os == 'macOS' }}
+        run: brew install hdf5
+
       - name: Check and test code
         run: just test

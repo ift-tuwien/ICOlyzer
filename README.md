@@ -290,7 +290,7 @@ in the description below.
 
 ## Test
 
-To run the tests please use the following command:
+Before you run the tests (on Linux and macOS) please make sure that you installed [`h5dump`](https://support.hdfgroup.org/documentation/hdf5/latest/_h5_t_o_o_l__d_p__u_g.html). After that use the following command:
 
 ```sh
 just test

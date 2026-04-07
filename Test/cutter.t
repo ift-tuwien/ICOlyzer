@@ -64,6 +64,23 @@ Check that overwriting output data works
 
   $ icocutter --time 10 -o examples/log-z.hdf5 >/dev/null
 
+Check that the number of measurement values
+
+  $ h5dump -a acceleration/NROWS examples/log-z-part-1.hdf5 | 
+  > grep '(0)' |
+  > sed -E 's/.*: ([[:digit:]]+)$/\1/'
+  94449
+
+  $ h5dump -a acceleration/NROWS examples/log-z-part-2.hdf5 | 
+  > grep '(0)' |
+  > sed -E 's/.*: ([[:digit:]]+)$/\1/'
+  189231
+
+  $ h5dump -a acceleration/NROWS examples/log-z.hdf5 | 
+  > grep '(0)' |
+  > sed -E 's/.*: ([[:digit:]]+)$/\1/'
+  283680
+
 Cleanup
 
   $ rm examples/log-z-part-1.hdf5
