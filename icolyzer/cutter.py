@@ -9,7 +9,7 @@ from pathlib import Path
 from sys import exit as sys_exit, stderr
 
 from pandas import read_hdf
-from tables import open_file
+from tables import HDF5ExtError, open_file
 
 from icolyzer.cli import file_exists, measurement_time
 
@@ -159,20 +159,25 @@ def main() -> None:
     first_part_filepath = filepath.with_stem(f"{filepath.stem}-part-1")
     second_part_filepath = filepath.with_stem(f"{filepath.stem}-part-2")
 
-    with open_file(filepath, mode="r") as original:
-        original.copy_file(first_part_filepath, overwrite=args.overwrite)
-        original.copy_file(second_part_filepath, overwrite=args.overwrite)
+    try:
+        with open_file(filepath, mode="r") as original:
+            original.copy_file(first_part_filepath, overwrite=args.overwrite)
+            original.copy_file(second_part_filepath, overwrite=args.overwrite)
 
-    first_row_removed = remove_second_part(first_part_filepath, cut_timedelta)
-    print(
-        f"Stored first part of HDF data ({timedelta(seconds=0)} – "
-        f"{cut_timedelta}) in “{first_part_filepath}”"
-    )
-    remove_first_part(second_part_filepath, first_row_removed)
-    print(
-        f"Stored second part of HDF data ({cut_timedelta} – "
-        f"{measurement_timedelta}) in “{second_part_filepath}”"
-    )
+        first_row_removed = remove_second_part(
+            first_part_filepath, cut_timedelta
+        )
+        print(
+            f"Stored first part of HDF data ({timedelta(seconds=0)} – "
+            f"{cut_timedelta}) in “{first_part_filepath}”"
+        )
+        remove_first_part(second_part_filepath, first_row_removed)
+        print(
+            f"Stored second part of HDF data ({cut_timedelta} – "
+            f"{measurement_timedelta}) in “{second_part_filepath}”"
+        )
+    except HDF5ExtError as error:
+        exit_error(f"Unable to cut HDF5 file: {error}")
 
 
 # -- Main ---------------------------------------------------------------------
