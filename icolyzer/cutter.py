@@ -106,9 +106,8 @@ def main() -> None:
         data = copy.get_node("/acceleration")
         cut_microseconds = cut_timedelta.total_seconds() * 1_000_000
         last_row_to_include = 0
-        # pylint: disable=fixme
-        # TODO: Use faster algorithm (maybe binary search or something similar)
-        # pylint: enable=fixme
+        # It might make more sense to use a faster algorithm (e.g. something
+        # like binary search) for determining the cut-off.
         for row in data.iterrows():
             if row["timestamp"] > cut_microseconds:
                 break
