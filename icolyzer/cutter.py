@@ -71,6 +71,46 @@ def exit_error(message: str) -> None:
     sys_exit(1)
 
 
+def remove_second_part(filepath: Path, cutoff: timedelta) -> int:
+    """Remove measurement data after a certain cutoff point
+
+    Args:
+
+        filepath:
+
+            Path to the HDF file that should be cut
+
+        cutoff:
+
+            The duration after which measurement data should be removed
+
+    Returns:
+
+        The index of the last row of the modified measurement data
+
+    """
+
+    last_row_to_include = 0
+
+    with open_file(filepath, mode="r+") as copy:
+        data = copy.get_node("/acceleration")
+        cut_microseconds = cutoff.total_seconds() * 1_000_000
+        # It might make more sense to use a faster algorithm (e.g. something
+        # like binary search) for determining the cut-off.
+        for row in data.iterrows():
+            if row["timestamp"] > cut_microseconds:
+                break
+            last_row_to_include += 1
+
+        data.remove_rows(last_row_to_include)
+        print(
+            f"Stored first part of HDF data ({timedelta(seconds=0)} – "
+            f"{cutoff}) in “{filepath}”"
+        )
+
+    return last_row_to_include
+
+
 def main() -> None:
     """Split a HDF5 measurement file into two parts"""
 
@@ -102,22 +142,7 @@ def main() -> None:
     with open_file(filepath, mode="r") as original:
         original.copy_file(first_part_filepath, overwrite=args.overwrite)
 
-    with open_file(first_part_filepath, mode="r+") as copy:
-        data = copy.get_node("/acceleration")
-        cut_microseconds = cut_timedelta.total_seconds() * 1_000_000
-        last_row_to_include = 0
-        # It might make more sense to use a faster algorithm (e.g. something
-        # like binary search) for determining the cut-off.
-        for row in data.iterrows():
-            if row["timestamp"] > cut_microseconds:
-                break
-            last_row_to_include += 1
-
-        data.remove_rows(last_row_to_include)
-        print(
-            f"Stored first part of HDF data ({timedelta(seconds=0)} – "
-            f"{cut_timedelta}) in “{first_part_filepath}”"
-        )
+    remove_second_part(first_part_filepath, cut_timedelta)
 
 
 # -- Main ---------------------------------------------------------------------
