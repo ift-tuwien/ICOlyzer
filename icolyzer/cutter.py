@@ -5,7 +5,9 @@
 from argparse import ArgumentParser, Namespace
 from datetime import timedelta
 from logging import basicConfig, getLogger
+from os import sep
 from pathlib import Path
+from platform import system
 from sys import exit as sys_exit, stderr
 
 from pandas import read_hdf
@@ -61,6 +63,36 @@ def get_arguments() -> Namespace:
     )
 
     return parser.parse_args()
+
+
+def get_maximum_filename_length(directory: Path) -> int:
+    """Determine the maximum filename length for a given directory
+
+    Args:
+
+        directory:
+
+            The filepath of the directory where the maximum filename length
+            should be determined
+
+    Returns:
+
+        The maximum filename length for a new file in the given directory
+
+    """
+
+    if system() != "Windows":
+        # pylint: disable=import-outside-toplevel, no-name-in-module
+
+        from os import pathconf  # type: ignore[attr-defined]
+
+        # pylint: enable=import-outside-toplevel, no-name-in-module
+
+        return pathconf(directory, "PC_NAME_MAX")
+
+    # https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation
+    max_path_length_windows = 260
+    return max_path_length_windows - len(str(directory) + sep)
 
 
 def exit_error(message: str) -> None:
@@ -156,8 +188,11 @@ def main() -> None:
             f"measurement time of “{measurement_timedelta}”",
         )
 
-    first_part_filepath = filepath.with_stem(f"{filepath.stem}-part-1")
-    second_part_filepath = filepath.with_stem(f"{filepath.stem}-part-2")
+    max_filename_length = get_maximum_filename_length(filepath.parent)
+
+    basename = filepath.stem[0 : max_filename_length - len("-part-_")]
+    first_part_filepath = filepath.with_stem(f"{basename}-part-1")
+    second_part_filepath = filepath.with_stem(f"{basename}-part-2")
 
     try:
         with open_file(filepath, mode="r") as original:
