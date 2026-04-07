@@ -4,6 +4,7 @@
 
 from argparse import ArgumentParser, Namespace
 from datetime import timedelta
+from logging import basicConfig, getLogger
 from pathlib import Path
 from sys import exit as sys_exit, stderr
 
@@ -29,6 +30,15 @@ def get_arguments() -> Namespace:
         "filepath",
         type=file_exists,
         help="measurement data in HDF5 format",
+    )
+
+    parser.add_argument(
+        "-l",
+        "--log",
+        choices=("debug", "info", "warning", "error", "critical"),
+        default="warning",
+        required=False,
+        help="minimum log level",
     )
 
     parser.add_argument(
@@ -65,6 +75,14 @@ def main() -> None:
     """Split a HDF5 measurement file into two parts"""
 
     args = get_arguments()
+
+    basicConfig(
+        level=args.log.upper(),
+        style="{",
+        format="{asctime} {levelname:7} {message}",
+    )
+    logger = getLogger(__name__)
+    logger.info("CLI arguments %s", args)
 
     filepath = Path(args.filepath)
     data = read_hdf(filepath, key="acceleration")
