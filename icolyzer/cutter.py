@@ -32,6 +32,14 @@ def get_arguments() -> Namespace:
     )
 
     parser.add_argument(
+        "-o",
+        "--overwrite",
+        action="store_true",
+        default=False,
+        help="overwrite output files",
+    )
+
+    parser.add_argument(
         "-t",
         "--time",
         type=measurement_time,
@@ -74,11 +82,7 @@ def main() -> None:
     first_part_filepath = filepath.with_stem(f"{filepath.stem}-part-1")
 
     with open_file(filepath, mode="r") as original:
-
-        # pylint: disable=fixme
-        # TODO: Remove overwrite=True
-        # pylint: enable=fixme
-        original.copy_file(first_part_filepath, overwrite=True)
+        original.copy_file(first_part_filepath, overwrite=args.overwrite)
 
     with open_file(first_part_filepath, mode="r+") as copy:
         data = copy.get_node("/acceleration")
