@@ -57,6 +57,10 @@ Check that opening an existing file works with a valid cutting time works
   Stored first .* \(0:00:00 – 0:00:10\) in “examples/log-z-part-1.hdf5” (re)
   Stored second.*\(0:00:10 – 0:00:29\.\d+\) in “examples/log-z-part-2.hdf5” (re)
 
+Check that overwriting output data works
+
+  $ icocutter --time 10 -o examples/log-z.hdf5 >/dev/null
+
 Cleanup
 
   $ rm examples/log-z-part-1.hdf5
