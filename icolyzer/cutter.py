@@ -176,7 +176,7 @@ def main() -> None:
             f"Stored second part of HDF data ({cut_timedelta} – "
             f"{measurement_timedelta}) in “{second_part_filepath}”"
         )
-    except HDF5ExtError as error:
+    except (HDF5ExtError, OSError) as error:
         exit_error(f"Unable to cut HDF5 file: {error}")
 
 
