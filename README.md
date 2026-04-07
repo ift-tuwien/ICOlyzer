@@ -279,7 +279,40 @@ Starting the conversion of: /Users/rene/Downloads/Measurement_2022-03-31_10-20-1
 Finished the conversion process
 ```
 
-# Development
+## ICOcutter
+
+- Splits a HDF5 file into two separate files based on a certain cutting time
+
+### Usage
+
+To split a HDF5 file into two segments you need to:
+
+- specify the filepath as positional argument and
+- the cutting point in number of second after the option `-t/--time`.
+
+For example, if we want to split the file **`log-x.hdf5`** into:
+
+- one file that contains all data up to the **first 5 seconds** and
+- and another file that contains the remaining data, we can use the following command:
+
+```sh
+icocutter -o --time 5 examples/log-x.hdf5
+```
+
+The command will use the same name as the input file with the additional postfix `-part-1` and `-part-2` added before the extension:
+
+```
+Stored first part of HDF data (0:00:00 – 0:00:05) in “examples/log-x-part-1.hdf5”
+Stored second part of HDF data (0:00:05 – 0:00:29.995849) in “examples/log-x-part-2.hdf5”
+```
+
+#### Parameters
+
+##### `-o`, `--overwrite`
+
+Use the option `-o`/`--overwrite` to overwrite output files, if they already exist.
+
+## Development
 
 While not strictly required we assume that you installed:
 
@@ -288,7 +321,7 @@ While not strictly required we assume that you installed:
 
 in the description below.
 
-## Test
+### Test
 
 Before you run the tests (on Linux and macOS) please make sure that you installed [`h5dump`](https://support.hdfgroup.org/documentation/hdf5/latest/_h5_t_o_o_l__d_p__u_g.html). After that use the following command:
 
