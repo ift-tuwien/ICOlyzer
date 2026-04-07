@@ -114,6 +114,10 @@ def main() -> None:
             last_row_to_include += 1
 
         data.remove_rows(last_row_to_include)
+        print(
+            f"Stored first part of HDF data ({timedelta(seconds=0)} – "
+            f"{cut_timedelta}) in “{first_part_filepath}”"
+        )
 
 
 # -- Main ---------------------------------------------------------------------

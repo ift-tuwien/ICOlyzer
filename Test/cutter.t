@@ -54,6 +54,7 @@ Check that using a cutting time is too large fails
 Check that opening an existing file works with a valid cutting time works
 
   $ icocutter --time 10 examples/log-z.hdf5
+  Stored first .* \(0:00:00 – 0:00:10\) in “examples/log-z-part-1.hdf5” (re)
 
 Cleanup
 
