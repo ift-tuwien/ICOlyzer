@@ -28,15 +28,9 @@ To release a new version of ICOlyzer, please use the following steps:
    git switch main
    ```
 
-2. Check that the checks and tests finish successfully on Linux, macOS and Windows
+2. Check that the [**CI jobs** for the `main` branch finish successfully](https://github.com/ift-tuwien/ICOlyzer/actions)
 
-   ```sh
-   just
-   ```
-
-3. Check that the [**CI jobs** for the `main` branch finish successfully](https://github.com/ift-tuwien/ICOlyzer/actions)
-
-4. Change the version number and commit your changes:
+3. Change the version number and commit your changes:
 
    ```sh
    just release <VERSION>
@@ -44,7 +38,7 @@ To release a new version of ICOlyzer, please use the following steps:
 
    **Note:** [GitHub Actions](https://github.com/ift-tuwien/ICOlyzer/actions) will publish a package based on the tagged commit and upload it to [PyPi](https://pypi.org/project/icotronic/).
 
-5. Publish your release on GitHub:
+4. Publish your release on GitHub:
 
    ```sh
    gh release create
