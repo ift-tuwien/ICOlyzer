@@ -14,7 +14,7 @@ from sphinx_pyproject import SphinxConfig
 config = SphinxConfig(
     Path(__file__).parent.parent.parent / "pyproject.toml", globalns=globals()
 )
-# pylint: disable=redefined-builtin,undefined-variable
+# pylint: disable=redefined-builtin, undefined-variable
 copyright = f"{datetime.now().year}, {author}"  # type: ignore[name-defined]
 # pylint: enable=redefined-builtin
 project = name  # type: ignore[name-defined]
