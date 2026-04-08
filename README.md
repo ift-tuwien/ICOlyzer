@@ -340,10 +340,10 @@ To release a new version of ICOlyzer, please use the following steps:
    git switch main
    ```
 
-2. Check that the test finish successfully on Linux, macOS and Windows
+2. Check that the checks and tests finish successfully on Linux, macOS and Windows
 
    ```sh
-   just test
+   just
    ```
 
 3. Check that the [**CI jobs** for the `main` branch finish successfully](https://github.com/ift-tuwien/ICOlyzer/actions)
