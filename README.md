@@ -332,6 +332,8 @@ just test
 
 ### Release
 
+**Note:** Please replace `<VERSION>` with the version number e.g. `1.9.0` in the text below
+
 To release a new version of ICOlyzer, please use the following steps:
 
 1. Switch to the `main` branch
@@ -348,7 +350,7 @@ To release a new version of ICOlyzer, please use the following steps:
 
 3. Check that the [**CI jobs** for the `main` branch finish successfully](https://github.com/ift-tuwien/ICOlyzer/actions)
 
-4. Change the version number and commit your changes (please replace `<VERSION>` with the version number e.g. `1.0.5`):
+4. Change the version number and commit your changes:
 
    ```sh
    just release <VERSION>
@@ -361,3 +363,10 @@ To release a new version of ICOlyzer, please use the following steps:
    ```sh
    gh release create
    ```
+
+   1. Choose the tag for the latest release
+   2. As title use “Version `<VERSION>`”, e.g. “Version 1.9.0”
+   3. Choose “Write my own”
+   4. Paste the [release notes](Releases) for the latest version into the text window
+   5. Save and close the text file
+   6. Answer “N” to the question “Is this a prerelease?”
