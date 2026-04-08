@@ -5,6 +5,7 @@
 from argparse import ArgumentParser, Namespace
 from datetime import timedelta
 from logging import basicConfig, getLogger
+from math import ceil
 from os import sep
 from pathlib import Path
 from platform import system
@@ -123,18 +124,32 @@ def remove_second_part(filepath: Path, cutoff: timedelta) -> int:
 
     """
 
-    first_row_to_remove = 0
+    def search_first_row_to_remove(data, cut_microseconds):
+        # Use binary search to get the approximate location of the cutoff point
+        start = 0
+        end = len(data) - 1
+        while start != end:
+            middle = start + ceil((end - start) / 2)
+            if data[middle]["timestamp"] > cut_microseconds:
+                end = middle - 1
+            else:
+                start = middle
+
+        # - If we found the next lowest or exact timestamp we only need to
+        #   search timestamps after the current one
+        # - If we found the next highest timestamp, we need to check the
+        #   timestamp before the current one
+        first_row_to_remove = max(0, start - 1)
+        while data[first_row_to_remove]["timestamp"] < cut_microseconds:
+            first_row_to_remove += 1
+        return first_row_to_remove
 
     with open_file(filepath, mode="r+") as copy:
         data = copy.get_node("/acceleration")
         cut_microseconds = cutoff.total_seconds() * 1_000_000
-        # It might make more sense to use a faster algorithm (e.g. something
-        # like binary search) for determining the cut-off.
-        for row in data.iterrows():
-            if row["timestamp"] > cut_microseconds:
-                break
-            first_row_to_remove += 1
-
+        first_row_to_remove = search_first_row_to_remove(
+            data, cut_microseconds
+        )
         data.remove_rows(first_row_to_remove)
 
     return first_row_to_remove
