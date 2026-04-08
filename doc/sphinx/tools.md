@@ -129,7 +129,7 @@ The ICOconverter script looks for the file `log.hdf5` in the current working dir
 icoconverter
 ```
 
-the script will run and analyze `log.hdf5`. The script will then convert the .hdf5 file and create `log.csv` and save it into the same directory. Attention: When there is already an file with the name of the converted .csv it will be overwritten.
+the script will run and analyze `log.hdf5`. The script will then convert the .hdf5 file and create `log.csv` and save it into the same directory. Attention: When there is already a file with the name of the converted .csv it will be overwritten.
 
 ```
 > icoconverter
