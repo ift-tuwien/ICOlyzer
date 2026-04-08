@@ -367,6 +367,6 @@ To release a new version of ICOlyzer, please use the following steps:
    1. Choose the tag for the latest release
    2. As title use “Version `<VERSION>`”, e.g. “Version 1.9.0”
    3. Choose “Write my own”
-   4. Paste the [release notes](Releases) for the latest version into the text window
+   4. Paste the [release notes](doc/releases) for the latest version into the text window
    5. Save and close the text file
    6. Answer “N” to the question “Is this a prerelease?”
