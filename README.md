@@ -316,6 +316,7 @@ Use the option `-o`/`--overwrite` to overwrite output files, if they already exi
 
 While not strictly required we assume that you installed:
 
+- [`gh`](https://cli.github.com),
 - [`just`](https://github.com/casey/just) and
 - [`uv`](https://docs.astral.sh/uv)
 
@@ -328,3 +329,35 @@ Before you run the tests (on Linux and macOS) please make sure that you installe
 ```sh
 just test
 ```
+
+### Release
+
+To release a new version of ICOlyzer, please use the following steps:
+
+1. Switch to the `main` branch
+
+   ```sh
+   git switch main
+   ```
+
+2. Check that the test finish successfully on Linux, macOS and Windows
+
+   ```sh
+   just test
+   ```
+
+3. Check that the [**CI jobs** for the `main` branch finish successfully](https://github.com/ift-tuwien/ICOlyzer/actions)
+
+4. Change the version number and commit your changes (please replace `<VERSION>` with the version number e.g. `1.0.5`):
+
+   ```sh
+   just release <VERSION>
+   ```
+
+   **Note:** [GitHub Actions](https://github.com/ift-tuwien/ICOlyzer/actions) will publish a package based on the tagged commit and upload it to [PyPi](https://pypi.org/project/icotronic/).
+
+5. Publish your release on GitHub:
+
+   ```sh
+   gh release create
+   ```
