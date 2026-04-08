@@ -44,7 +44,11 @@ version = "1.9.0b1"
 dev = [
     "Flake8-pyproject>=1.2.3",
     "mypy",
+    "myst-parser>=5",
     "pylint>=3.0.2",
+    "sphinx>=9.1.0,<10",
+    "sphinx-pyproject>=0.3",
+    "sphinx_rtd_theme",
     "toml",
 ]
 test = [

@@ -7,6 +7,9 @@ set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
 
 package := "icolyzer"
 
+sphinx_directory := "sphinx"
+sphinx_input_directory := "doc/sphinx"
+
 export PYTEST_ADDOPTS := if os() == "windows" { "-p no:prysk" } else { "" }
 
 # -- Recipes -------------------------------------------------------------------
@@ -53,3 +56,26 @@ release version:
 	git tag "${version}"
 	git push
 	git push --tags
+
+# =================
+# = Documentation =
+# =================
+
+# Generate documentation
+[group('documentation')]
+documentation: setup
+	uv run sphinx-build -M html {{sphinx_input_directory}} {{sphinx_directory}}
+
+# Remove documentation
+[group('documentation')]
+[windows]
+clean:
+	#!pwsh
+	Remove-Item -Recurse {{sphinx_directory}}
+
+# Remove documentation
+[group('documentation')]
+[unix]
+clean:
+	#!/usr/bin/env sh -e
+	rm -rf {{sphinx_directory}}
