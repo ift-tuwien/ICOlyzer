@@ -1,6 +1,6 @@
 # ICOlyzer
 
-Auxiliary set of tools to analyze data from the [ICOtronic system](https://github.com/MyTooliT/ICOc):
+Auxiliary set of tools to analyze data from the [ICOtronic system](https://github.com/ift-tuwien/ICOlyzer):
 
 - [ICOplotter](#readme:section:icoplotter): Visualize data and calculate signal to noise ratio
 - [ICOanalyzer](#readme:section:icoanalyzer): Measures packet loss
@@ -52,7 +52,7 @@ icoplotter
 
 the script will load this file and open the graph of the recording:
 
-<img src="https://raw.githubusercontent.com/MyTooliT/ICOlyzer/main/assets/Plotter.webp" alt="Plotter window" style="zoom:40%;" />
+<img src="https://raw.githubusercontent.com/ift-tuwien/ICOlyzer/main/assets/Plotter.webp" alt="Plotter window" style="zoom:40%;" />
 
 The calculated SNR will be written to the standard output.
 
@@ -85,7 +85,7 @@ Prints the help menu of the command
 
 Highlight periods containing lost data using red lines:
 
-<img src="https://raw.githubusercontent.com/MyTooliT/ICOlyzer/main/assets/Plotter-Data-Loss.webp" alt="Data plot containing red lines that highlight periods with data loss" style="zoom:40%;" />
+<img src="https://raw.githubusercontent.com/ift-tuwien/ICOlyzer/main/assets/Plotter-Data-Loss.webp" alt="Data plot containing red lines that highlight periods with data loss" style="zoom:40%;" />
 
 ##### `-p`, `--print`
 
