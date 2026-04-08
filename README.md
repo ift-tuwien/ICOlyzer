@@ -23,7 +23,7 @@ pip install icolyzer
 To install the latest development version use:
 
 ```sh
-pip install --upgrade git+https://github.com/mytoolit/ICOlyzer
+pip install --upgrade git+https://github.com/ift-tuwien/ICOlyzer
 ```
 
 ### Remove
