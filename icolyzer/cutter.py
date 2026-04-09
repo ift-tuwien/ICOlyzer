@@ -10,6 +10,7 @@ from os import sep
 from pathlib import Path
 from platform import system
 from sys import exit as sys_exit, stderr
+from tempfile import TemporaryDirectory
 
 from pandas import read_hdf
 from tables import HDF5ExtError, open_file, Table
@@ -128,7 +129,7 @@ def search_first_row_larger_timestamp(
     """
 
     logger = getLogger(__file__)
-    logger.debug(f"Cutoff point in us: {cut_microseconds}")
+    logger.debug("Cutoff point in us: %s", cut_microseconds)
 
     # Use binary search to get the approximate location of the cutoff point
     start = 0
@@ -150,14 +151,26 @@ def search_first_row_larger_timestamp(
     return first_row_larger_timestamp
 
 
-def remove_second_part(filepath: Path, cutoff: timedelta) -> int:
-    """Remove measurement data after a certain cutoff point
+def copy_second_part_removed(
+    original: Path, modified: Path, overwrite: bool, cutoff: timedelta
+) -> int:
+    """Copy a file and remove measurement data after a certain cutoff point
 
     Args:
 
-        filepath:
+        original:
 
-            Path to the HDF file that should be cut
+            Path to the original HDF file
+
+        modified:
+
+            Path to the file that should not contain data after the cutoff
+            point
+
+        overwrite:
+
+            Specifies if the file at ``modified`` should be overwritten, if
+            it already exists
 
         cutoff:
 
@@ -170,15 +183,26 @@ def remove_second_part(filepath: Path, cutoff: timedelta) -> int:
 
     """
 
-    with open_file(filepath, mode="r+") as copy:
-        data = copy.get_node("/acceleration")
-        cut_microseconds = cutoff.total_seconds() * 1_000_000
-        first_row_to_remove = search_first_row_larger_timestamp(
-            data, int(cut_microseconds)
-        )
-        data.remove_rows(first_row_to_remove)
+    with TemporaryDirectory() as temporary_directory:
+        temporary_filepath = Path(temporary_directory) / "temp.hdf5"
+        with open_file(original, mode="r") as opened_file:
+            opened_file.copy_file(temporary_filepath)
 
-    return first_row_to_remove
+        with open_file(temporary_filepath, mode="r+") as temporary_copy:
+            data = temporary_copy.get_node("/acceleration")
+            cut_microseconds = cutoff.total_seconds() * 1_000_000
+            first_row_to_remove = search_first_row_larger_timestamp(
+                data, int(cut_microseconds)
+            )
+            data.remove_rows(first_row_to_remove)
+
+        # Removing rows from the table does not make the file smaller
+        # This is why we copy a temporary file again to make the resulting
+        # file smaller
+        with open_file(temporary_filepath, mode="r") as temporary_copy:
+            temporary_copy.copy_file(modified, overwrite=overwrite)
+
+        return first_row_to_remove
 
 
 def remove_first_part(filepath: Path, first_row: int) -> None:
@@ -237,11 +261,13 @@ def main() -> None:
 
     try:
         with open_file(filepath, mode="r") as original:
-            original.copy_file(first_part_filepath, overwrite=args.overwrite)
             original.copy_file(second_part_filepath, overwrite=args.overwrite)
 
-        first_row_removed = remove_second_part(
-            first_part_filepath, cut_timedelta
+        first_row_removed = copy_second_part_removed(
+            original=filepath,
+            modified=first_part_filepath,
+            overwrite=args.overwrite,
+            cutoff=cut_timedelta,
         )
         print(
             f"Stored first part of HDF data ({timedelta(seconds=0)} – "
