@@ -248,10 +248,16 @@ def copy_and_modify(
 
     """
 
+    logger = getLogger(__file__)
+
     with TemporaryDirectory() as temporary_directory:
         temporary_filepath = Path(temporary_directory) / "temp.hdf5"
+
         with open_file(original, mode="r") as opened_file:
             opened_file.copy_file(temporary_filepath)
+        logger.debug(
+            "Stored temporary data in %s", temporary_filepath.resolve()
+        )
 
         with open_file(temporary_filepath, mode="r+") as temporary_copy:
             data = temporary_copy.get_node("/acceleration")
