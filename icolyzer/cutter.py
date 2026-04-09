@@ -4,6 +4,7 @@
 
 from argparse import ArgumentParser, Namespace
 from datetime import timedelta
+from functools import partial
 from logging import basicConfig, getLogger
 from math import ceil
 from os import sep
@@ -151,64 +152,76 @@ def search_first_row_larger_timestamp(
     return first_row_larger_timestamp
 
 
-def copy_first_part(
-    original: Path, modified: Path, overwrite: bool, cutoff: timedelta
-) -> int:
-    """Copy a file and remove measurement data after a certain cutoff point
+def determine_cutoff(filepath: Path, cutoff: timedelta) -> int:
+    """Determine the cutoff index in some measurement data
 
     Args:
 
-        original:
+        filepath:
 
-            Path to the original HDF file
+            The path to the file that contains the measurement data
 
-        modified:
+        cut_off:
 
-            Path to the file that should not contain data after the cutoff
-            point
-
-        overwrite:
-
-            Specifies if the file at ``modified`` should be overwritten, if
-            it already exists
-
-        cutoff:
-
-            The duration after which measurement data should be removed
+            The maximum timestamp value that should be contained in the data
+            between row index 0 and the index returned by this function - 1
 
     Returns:
 
-        The index of the first row that is not part of the modified
-        measurement data
+        The first row index of the measurement table that contains a timestamp
+        value that is larger than ``cutoff``
 
     """
 
-    with TemporaryDirectory() as temporary_directory:
-        temporary_filepath = Path(temporary_directory) / "temp.hdf5"
-        with open_file(original, mode="r") as opened_file:
-            opened_file.copy_file(temporary_filepath)
-
-        with open_file(temporary_filepath, mode="r+") as temporary_copy:
-            data = temporary_copy.get_node("/acceleration")
-            cut_microseconds = cutoff.total_seconds() * 1_000_000
-            first_row_to_remove = search_first_row_larger_timestamp(
-                data, int(cut_microseconds)
-            )
-            data.remove_rows(first_row_to_remove)
-
-        # Removing rows from the table does not make the file smaller
-        # This is why we copy a temporary file again to make the resulting
-        # file smaller
-        with open_file(temporary_filepath, mode="r") as temporary_copy:
-            temporary_copy.copy_file(modified, overwrite=overwrite)
-
+    with open_file(filepath, mode="r") as opened_file:
+        data = opened_file.get_node("/acceleration")
+        cut_microseconds = cutoff.total_seconds() * 1_000_000
+        first_row_to_remove = search_first_row_larger_timestamp(
+            data, int(cut_microseconds)
+        )
         return first_row_to_remove
 
 
-def copy_second_part(
-    original: Path, modified: Path, overwrite: bool, first_row: int
+def remove_second_part(data: Table, first_row_to_remove: int) -> None:
+    """Remove the second part of a table
+
+    Args:
+
+        data:
+
+            The table that should be modified
+
+        first_row_to_remove:
+
+            The index of the first row that should be removed
+
+    """
+
+    data.remove_rows(first_row_to_remove)
+
+
+def remove_first_part(data: Table, first_row_to_exclude: int) -> None:
+    """Remove the first part of a table
+
+    Args:
+
+        data:
+
+            The table that should be modified
+
+        first_row_to_exclude:
+
+            The index of the first row that should not be removed
+
+    """
+
+    data.remove_rows(start=0, stop=first_row_to_exclude)
+
+
+def copy_and_modify(
+    original: Path, modified: Path, overwrite: bool, modify
 ) -> None:
-    """Copy a file and remove measurement data before a certain cutoff point
+    """Copy a file and modify measurement data according to a given function
 
     Args:
 
@@ -218,18 +231,16 @@ def copy_second_part(
 
         modified:
 
-            Path to the file that should not contain data after the cutoff
-            point
+            Path to the file that should contain the modified measurement data
 
         overwrite:
 
             Specifies if the file at ``modified`` should be overwritten, if
             it already exists
 
-        first_row:
+        modify:
 
-            The index of the first row that should be included in the
-            modified measurement data
+            A function that modifies the measurement data
 
     """
 
@@ -240,7 +251,7 @@ def copy_second_part(
 
         with open_file(temporary_filepath, mode="r+") as temporary_copy:
             data = temporary_copy.get_node("/acceleration")
-            data.remove_rows(start=0, stop=first_row)
+            modify(data=data)
 
         # Removing rows from the table does not make the file smaller
         # This is why we copy a temporary file again to make the resulting
@@ -282,25 +293,30 @@ def main() -> None:
     second_part_filepath = filepath.with_stem(f"{basename}-part-2")
 
     try:
-        with open_file(filepath, mode="r") as original:
-            original.copy_file(second_part_filepath, overwrite=args.overwrite)
 
-        first_row_removed = copy_first_part(
+        cutoff_index = determine_cutoff(filepath, cut_timedelta)
+
+        copy_and_modify(
             original=filepath,
             modified=first_part_filepath,
             overwrite=args.overwrite,
-            cutoff=cut_timedelta,
+            modify=partial(
+                remove_second_part, first_row_to_remove=cutoff_index
+            ),
         )
         print(
             f"Stored first part of HDF data ({timedelta(seconds=0)} – "
             f"{cut_timedelta}) in “{first_part_filepath}”"
         )
-        copy_second_part(
+        copy_and_modify(
             original=filepath,
             modified=second_part_filepath,
             overwrite=args.overwrite,
-            first_row=first_row_removed,
+            modify=partial(
+                remove_first_part, first_row_to_exclude=cutoff_index
+            ),
         )
+
         print(
             f"Stored second part of HDF data ({cut_timedelta} – "
             f"{measurement_timedelta}) in “{second_part_filepath}”"
