@@ -62,7 +62,7 @@ Check that opening an existing file works with a valid cutting time works
 
 Check that overwriting output data works
 
-  $ icocutter --time 10 -o examples/log-z.hdf5 >/dev/null
+  $ icocutter --time 9.999958 -o examples/log-z.hdf5 >/dev/null
 
 Check that the number of measurement values
 

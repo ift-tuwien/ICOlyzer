@@ -12,7 +12,7 @@ from platform import system
 from sys import exit as sys_exit, stderr
 
 from pandas import read_hdf
-from tables import HDF5ExtError, open_file
+from tables import HDF5ExtError, open_file, Table
 
 from icolyzer.cli import file_exists, measurement_time
 
@@ -104,6 +104,52 @@ def exit_error(message: str) -> None:
     sys_exit(1)
 
 
+def search_first_row_larger_timestamp(
+    data: Table, cut_microseconds: int
+) -> int:
+    """Search a table containing acceleration data for a cutoff index
+
+    Args:
+
+        data:
+
+            A table containing acceleration data
+
+        cut_microseconds:
+
+            The maximum timestamp value that should still be contained in the
+            data specified by the index returned by this function
+
+    Returns:
+
+        The first row index in ``data`` that contains a timestamp that is
+        larger than ``cut_microseconds``
+
+    """
+
+    logger = getLogger(__file__)
+    logger.debug(f"Cutoff point in us: {cut_microseconds}")
+
+    # Use binary search to get the approximate location of the cutoff point
+    start = 0
+    end = len(data) - 1
+    while start != end:
+        middle = start + ceil((end - start) / 2)
+        if data[middle]["timestamp"] > cut_microseconds:
+            end = middle - 1
+        else:
+            start = middle
+
+    # - If we found the next lowest or exact timestamp we only need to
+    #   search timestamps after the current one
+    # - If we found the next highest timestamp, we need to check the
+    #   timestamp before the current one
+    first_row_larger_timestamp = max(0, start - 1)
+    while data[first_row_larger_timestamp]["timestamp"] <= cut_microseconds:
+        first_row_larger_timestamp += 1
+    return first_row_larger_timestamp
+
+
 def remove_second_part(filepath: Path, cutoff: timedelta) -> int:
     """Remove measurement data after a certain cutoff point
 
@@ -124,31 +170,11 @@ def remove_second_part(filepath: Path, cutoff: timedelta) -> int:
 
     """
 
-    def search_first_row_to_remove(data, cut_microseconds):
-        # Use binary search to get the approximate location of the cutoff point
-        start = 0
-        end = len(data) - 1
-        while start != end:
-            middle = start + ceil((end - start) / 2)
-            if data[middle]["timestamp"] > cut_microseconds:
-                end = middle - 1
-            else:
-                start = middle
-
-        # - If we found the next lowest or exact timestamp we only need to
-        #   search timestamps after the current one
-        # - If we found the next highest timestamp, we need to check the
-        #   timestamp before the current one
-        first_row_to_remove = max(0, start - 1)
-        while data[first_row_to_remove]["timestamp"] < cut_microseconds:
-            first_row_to_remove += 1
-        return first_row_to_remove
-
     with open_file(filepath, mode="r+") as copy:
         data = copy.get_node("/acceleration")
         cut_microseconds = cutoff.total_seconds() * 1_000_000
-        first_row_to_remove = search_first_row_to_remove(
-            data, cut_microseconds
+        first_row_to_remove = search_first_row_larger_timestamp(
+            data, int(cut_microseconds)
         )
         data.remove_rows(first_row_to_remove)
 
