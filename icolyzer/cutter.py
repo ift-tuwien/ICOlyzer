@@ -12,6 +12,7 @@ from pathlib import Path
 from platform import system
 from sys import exit as sys_exit, stderr
 from tempfile import TemporaryDirectory
+from typing import Callable
 
 from pandas import read_hdf
 from tables import HDF5ExtError, open_file, Table
@@ -219,7 +220,10 @@ def remove_first_part(data: Table, first_row_to_exclude: int) -> None:
 
 
 def copy_and_modify(
-    original: Path, modified: Path, overwrite: bool, modify
+    original: Path,
+    modified: Path,
+    overwrite: bool,
+    modify: Callable[[Table], None],
 ) -> None:
     """Copy a file and modify measurement data according to a given function
 
@@ -251,7 +255,7 @@ def copy_and_modify(
 
         with open_file(temporary_filepath, mode="r+") as temporary_copy:
             data = temporary_copy.get_node("/acceleration")
-            modify(data=data)
+            modify(data)
 
         # Removing rows from the table does not make the file smaller
         # This is why we copy a temporary file again to make the resulting
