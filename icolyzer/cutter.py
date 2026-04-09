@@ -151,7 +151,7 @@ def search_first_row_larger_timestamp(
     return first_row_larger_timestamp
 
 
-def copy_second_part_removed(
+def copy_first_part(
     original: Path, modified: Path, overwrite: bool, cutoff: timedelta
 ) -> int:
     """Copy a file and remove measurement data after a certain cutoff point
@@ -263,7 +263,7 @@ def main() -> None:
         with open_file(filepath, mode="r") as original:
             original.copy_file(second_part_filepath, overwrite=args.overwrite)
 
-        first_row_removed = copy_second_part_removed(
+        first_row_removed = copy_first_part(
             original=filepath,
             modified=first_part_filepath,
             overwrite=args.overwrite,
