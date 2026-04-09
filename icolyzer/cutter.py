@@ -205,26 +205,48 @@ def copy_first_part(
         return first_row_to_remove
 
 
-def remove_first_part(filepath: Path, first_row: int) -> None:
-    """Remove measurement before a certain cutoff point
+def copy_second_part(
+    original: Path, modified: Path, overwrite: bool, first_row: int
+) -> None:
+    """Copy a file and remove measurement data before a certain cutoff point
 
     Args:
 
-        filepath:
+        original:
 
-            Path to the HDF file that should be cut
+            Path to the original HDF file
+
+        modified:
+
+            Path to the file that should not contain data after the cutoff
+            point
+
+        overwrite:
+
+            Specifies if the file at ``modified`` should be overwritten, if
+            it already exists
 
         first_row:
 
             The index of the first row that should be included in the
-            measurement data
+            modified measurement data
 
     """
 
-    with open_file(filepath, mode="r+") as copy:
-        data = copy.get_node("/acceleration")
+    with TemporaryDirectory() as temporary_directory:
+        temporary_filepath = Path(temporary_directory) / "temp.hdf5"
+        with open_file(original, mode="r") as opened_file:
+            opened_file.copy_file(temporary_filepath)
 
-        data.remove_rows(start=0, stop=first_row)
+        with open_file(temporary_filepath, mode="r+") as temporary_copy:
+            data = temporary_copy.get_node("/acceleration")
+            data.remove_rows(start=0, stop=first_row)
+
+        # Removing rows from the table does not make the file smaller
+        # This is why we copy a temporary file again to make the resulting
+        # file smaller
+        with open_file(temporary_filepath, mode="r") as temporary_copy:
+            temporary_copy.copy_file(modified, overwrite=overwrite)
 
 
 def main() -> None:
@@ -273,7 +295,12 @@ def main() -> None:
             f"Stored first part of HDF data ({timedelta(seconds=0)} – "
             f"{cut_timedelta}) in “{first_part_filepath}”"
         )
-        remove_first_part(second_part_filepath, first_row_removed)
+        copy_second_part(
+            original=filepath,
+            modified=second_part_filepath,
+            overwrite=args.overwrite,
+            first_row=first_row_removed,
+        )
         print(
             f"Stored second part of HDF data ({cut_timedelta} – "
             f"{measurement_timedelta}) in “{second_part_filepath}”"
