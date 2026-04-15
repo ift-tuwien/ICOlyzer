@@ -63,7 +63,7 @@ icoplotter = "icolyzer.plotter:main"
 icocutter = "icolyzer.cutter:main"
 
 [project.urls]
-Source = "https://github.com/mytoolit/ICOlyzer/"
+Source = "https://github.com/ift-tuwien/ICOlyzer/"
 
 [tool.black]
 line-length = 79
