@@ -36,7 +36,7 @@ To release a new version of ICOlyzer, please use the following steps:
    just release <VERSION>
    ```
 
-   **Note:** [GitHub Actions](https://github.com/ift-tuwien/ICOlyzer/actions) will publish a package based on the tagged commit and upload it to [PyPi](https://pypi.org/project/icotronic/).
+   **Note:** [GitHub Actions](https://github.com/ift-tuwien/ICOlyzer/actions) will publish a package based on the tagged commit and upload it to [PyPi](https://pypi.org/project/icolyzer/).
 
 4. Publish your release on GitHub:
 
